@@ -124,6 +124,9 @@ export default {
                 // Check if we have this network already
                 net = state.getNetworkFromAddress(netAddress);
 
+                // Save nick for next authorizations
+                state.setSetting('user_settings.previous_nick', this.nick);
+
                 // If we retreived an existing network, update the nick+password with what
                 // the user has just put in place
                 if (net) {
@@ -186,11 +189,18 @@ export default {
             let tmp = (nick || '').replace(/\?/g, () => Math.floor(Math.random() * 100).toString());
             return _.trim(tmp);
         },
+        getPreviousNick: function getPreviousNick() {
+            // Get previous nick if exists
+            return state.getSetting('user_settings.previous_nick');
+        },
     },
     created: function created() {
+        // Watch for changes in "user_settings" settings
+        state.persistence.watchStateForChanges();
+
         let options = state.settings.startupOptions;
 
-        this.nick = this.processNickRandomNumber(Misc.queryStringVal('nick') || options.nick || '');
+        this.nick = this.processNickRandomNumber(Misc.queryStringVal('nick') || this.getPreviousNick() || options.nick || '');
         this.password = options.password || '';
         this.channel = window.location.hash || options.channel || '';
         this.showChannel = typeof options.showChannel === 'boolean' ?
