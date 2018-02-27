@@ -195,9 +195,6 @@ export default {
         },
     },
     created: function created() {
-        // Watch for changes in "user_settings" settings
-        state.persistence.watchStateForChanges();
-
         let options = state.settings.startupOptions;
 
         this.nick = this.processNickRandomNumber(Misc.queryStringVal('nick') || this.getPreviousNick() || options.nick || '');
