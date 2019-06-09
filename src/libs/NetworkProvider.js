@@ -1,3 +1,5 @@
+'kiwi public';
+
 import eventEmitter from 'event-emitter';
 
 export default class NetworkProvider {
@@ -8,7 +10,7 @@ export default class NetworkProvider {
 
     addProvider(provider) {
         this.providers.push(provider);
-        provider.on('networks', networks => {
+        provider.on('networks', (networks) => {
             this.emit('networks', this.availableNetworks());
         });
     }
@@ -16,7 +18,7 @@ export default class NetworkProvider {
     availableNetworks() {
         let networks = Object.create(null);
 
-        this.providers.forEach(provider => {
+        this.providers.forEach((provider) => {
             let pType = provider.type;
             if (provider.networks.length > 0) {
                 networks[pType] = networks[pType] || [];

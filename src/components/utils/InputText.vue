@@ -1,58 +1,59 @@
 <template>
     <div
         :class="[
-            'input-text',
-            hasFocus ? 'input-text--focus' : '',
-            hasFocus || currentValue ? 'input-text--reveal-value' : ''
+            'u-input-text',
+            hasFocus ? 'u-input-text--focus' : '',
+            hasFocus || currentValue ? 'u-input-text--reveal-value' : ''
         ]"
     >
+
+        <span class="u-input-text-label">{{ label }}</span>
+
         <input
             v-if="type==='password'"
-            type="password"
             v-model="currentValue"
-            @focus="hasFocus=true"
-            @blur="hasFocus=false"
-            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-        />
+            type="password"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off" spellcheck="false" @focus="hasFocus=true" @blur="hasFocus=false"
+        >
         <input
             v-else-if="type==='number'"
-            type="number"
             v-model="currentValue"
+            type="number"
             @focus="hasFocus=true"
             @blur="hasFocus=false"
-        />
+        >
         <input
             v-else
             v-model="currentValue"
-            @focus="hasFocus=true"
-            @blur="hasFocus=false"
-            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-        />
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off" spellcheck="false" @focus="hasFocus=true" @blur="hasFocus=false"
+        >
 
-        <div v-if="$slots.default" class="input-text-c">
-            <slot></slot>
+        <div v-if="$slots.default" class="u-input-text-c">
+            <slot/>
         </div>
 
-        <span class="input-text-label">{{label}}</span>
-
-        <div class="input-text-underline">
-            <div class="input-text-underline-active"></div>
+        <div class="u-input-text-underline">
+            <div class="u-input-text-underline-active"/>
         </div>
     </div>
 </template>
 
-
 <script>
+'kiwi public';
 
 let Vue = require('vue');
 
 export default Vue.component('input-text', {
+    props: ['value', 'label', 'type'],
     data: function data() {
         return {
             hasFocus: false,
         };
     },
-    props: ['value', 'label', 'type'],
     computed: {
         currentValue: {
             get: function getCurrentValue() {
@@ -73,13 +74,12 @@ export default Vue.component('input-text', {
 
 <style>
 
-.input-text {
+.u-input-text {
     position: relative;
     padding-top: 1.2em;
-    font-size: 1em;
 }
 
-.input-text input {
+.u-input-text input {
     display: block;
     box-sizing: border-box;
     width: 100%;
@@ -87,35 +87,37 @@ export default Vue.component('input-text', {
     border: none;
     outline: none;
     line-height: 1.6em;
-    font-size: 1em;
+    font-size: 0.9em;
 }
 
-.input-text-label {
+.u-input-text-label {
     position: absolute;
     left: 3px;
     top: 1.2em;
-    transition: top 0.2s, font-size 0.2s;
+    opacity: 0.9;
+    transition: top 0.2s, font-size 0.2s, opacity 0.2;
     pointer-events: none;
 }
 
-.input-text--reveal-value .input-text-label {
-    top: 0;
+.u-input-text--reveal-value .u-input-text-label {
+    top: -7px;
     font-size: 0.8em;
+    opacity: 0.5;
 }
 
-.input-text-c {
+.u-input-text-c {
     position: absolute;
     right: 0;
     bottom: 0;
 }
 
-.input-text-underline {
+.u-input-text-underline {
     border-width: 0;
     border-bottom: 1px solid #a9a9a9;
     position: relative;
 }
 
-.input-text-underline-active {
+.u-input-text-underline-active {
     background: #42b983;
     transition: left 0.3s;
     position: absolute;
@@ -125,8 +127,21 @@ export default Vue.component('input-text', {
     left: 100%;
 }
 
-.input-text--focus .input-text-underline-active {
+.u-input-text--focus .u-input-text-underline-active {
     left: 0;
+}
+
+/* Remove spinners from input numbers */
+.u-input-text input[type='number'] {
+    /* For Firefox */
+    -moz-appearance: textfield;
+}
+
+.u-input-text input[type=number]::-webkit-inner-spin-button,
+.u-input-text input[type=number]::-webkit-outer-spin-button {
+    /* For webkit browsers like Safari and Chrome */
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 </style>

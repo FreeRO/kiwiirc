@@ -1,16 +1,19 @@
+'kiwi public';
+
+/** @module */
+
 /**
  * Command input Alias + re-writing
  *
  * Variables used in aliases:
- *     $0 = the command being run
- *     $1 = first param of input
- *     $N = Nth param of input
- *     $1+2 = first param of input and the next 2 words
- *     $2+4 = second param of input and the next 4 words
- *     $2+ = second param of input and all words after
- *     $variable = variable as set in the vars object
+ * - $0 = the command being run
+ * - $1 = first param of input
+ * - $N = Nth param of input
+ * - $1+2 = first param of input and the next 2 words
+ * - $2+4 = second param of input and the next 4 words
+ * - $2+ = second param of input and all words after
+ * - $variable = variable as set in the vars object
  */
-
 export default class AliasRewriter {
     constructor() {
         // Max alias recursion depth
@@ -21,12 +24,12 @@ export default class AliasRewriter {
         this.aliases = {};
     }
 
-
+    /** Reset the current aliases object from a newline delimited string of aliases */
     importFromString(str) {
         // Clear out the current aliases before adding new ones in
         this.aliases = {};
 
-        str.split('\n').forEach(line => {
+        str.split('\n').forEach((line) => {
             if (line[0] !== '/') {
                 return;
             }
@@ -45,7 +48,6 @@ export default class AliasRewriter {
             this.aliases[command.toLowerCase()] = actions;
         });
     }
-
 
     // Takes an array of words to process!
     processInput(input, vars) {
@@ -116,7 +118,6 @@ export default class AliasRewriter {
                 continue;
             }
 
-
             // Refering to a variable
             if (typeof vars[currentAliasWord.substr(1)] !== 'undefined') {
                 // Get the variable
@@ -129,7 +130,7 @@ export default class AliasRewriter {
         return compiled;
     }
 
-
+    /** Take a string input, process any aliases and output the finalised string */
     process(input, vars) {
         let line = input || '';
         let words = line.split(' ');

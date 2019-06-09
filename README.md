@@ -1,13 +1,13 @@
-# kiwiirc
+# Kiwi IRC
 
-> The next generation of the KiwiIRC web based IRC client
+> The next generation of the Kiwi IRC web based IRC client
 
 ### Easy supported ways to install Kiwi IRC
 If you just want to run Kiwi IRC and not modify it then pre-built and ready to use packages/installers/archives can be found here: https://kiwiirc.com/downloads/index.html
 
 
-### Dependancies
-Before you can build or start to develop on KiwiIRC, make sure to have the following installed on your system:
+### Dependencies
+Before you can build or start to develop on Kiwi IRC, make sure to have the following installed on your system:
 * [Nodejs](https://nodejs.org/)
 * [yarn](https://yarnpkg.com/)
 
@@ -16,6 +16,9 @@ Before you can build or start to develop on KiwiIRC, make sure to have the follo
 ``` bash
 # install dependencies
 yarn install
+
+# Optionally link git pre-commit linting hook
+ln -s $PWD/scripts/pre-commit .git/hooks/
 
 # development web server with hot reload at http://localhost:8080/
 yarn run dev
@@ -57,7 +60,7 @@ Kiwi IRC is tested on the below browsers. Other browsers are not checked and may
 * Chrome
 * Chrome Mobile (Android)
 * Firefox
-* IE10+
+* IE11
 * Safari 9+
 
 ## Thanks
@@ -67,7 +70,7 @@ Without these [Sponsors](sponsors.md) development would be much slower so many t
 
 ## License
 ~~~
-   Copyright 2017 Kiwi IRC
+   Copyright 2018 Kiwi IRC
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.

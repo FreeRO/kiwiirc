@@ -1,18 +1,26 @@
 <template>
-    <div class="kiwi-startup-common" :class="[
+    <div :class="[
         closing ? 'kiwi-startup-common--closing' : '',
         backgroundImage ? '' : 'kiwi-startup-common--no-bg',
-    ]" :style="backgroundStyle">
+    ]" :style="backgroundStyle" class="kiwi-startup-common">
         <div class="kiwi-startup-common-section kiwi-startup-common-section-connection">
-            <slot name="connection"></slot>
+            <slot name="connection"/>
         </div>
-        <div class="kiwi-startup-common-section kiwi-startup-common-section-info" :style="backgroundStyle">
-            <div class="kiwi-startup-common-section-info-content" v-if="infoContent" v-html="infoContent"></div>
+        <div
+            :style="backgroundStyle"
+            class="kiwi-startup-common-section kiwi-startup-common-section-info"
+        >
+            <div
+                v-if="infoContent"
+                class="kiwi-startup-common-section-info-content"
+                v-html="infoContent"
+            />
         </div>
     </div>
 </template>
 
 <script>
+'kiwi public';
 
 import state from '@/libs/state';
 
@@ -67,7 +75,7 @@ export default {
     position: absolute;
     top: 0;
     bottom: 0;
-    width: 50%;
+    width: 25%;
     padding: 1em;
     box-sizing: border-box;
     overflow-y: auto;
@@ -86,6 +94,7 @@ export default {
     right: 0;
     color: #fff;
     display: flex;
+    width: 75%;
     align-items: center;
     justify-content: center;
     min-height: 100%;
@@ -98,6 +107,16 @@ export default {
     font-size: 1.5em;
     padding: 2em;
     line-height: 1.6em;
+}
+
+@media (max-width: 1325px) {
+    .kiwi-startup-common-section {
+        width: 40%;
+    }
+
+    .kiwi-startup-common-section-info {
+        width: 60%;
+    }
 }
 
 @media (min-width: 850px) {
@@ -169,7 +188,7 @@ export default {
 .kiwi-startup-common-section-info {
     background-size: cover;
     background-position: bottom;
-    border-left: 5px solid #86b32d;
+    border-left: 5px solid #42b992;
 }
 
 .kiwi-startup-common--no-bg .kiwi-startup-common-section-info {
@@ -198,7 +217,7 @@ export default {
     }
 
     .kiwi-startup-common--no-bg .kiwi-startup-common-section-info {
-        border-top: 5px solid #86b32d;
+        border-top: 5px solid #42b992;
     }
 }
 

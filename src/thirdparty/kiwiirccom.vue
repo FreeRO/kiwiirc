@@ -1,36 +1,52 @@
 <template>
     <div class="kiwi-personal">
-        <h1>{{$t('personal_client')}}</h1>
+        <h1>{{ $t('personal_client') }}</h1>
 
-        <p>{{$t('personal_addjoin')}}</p>
-        <p>{{$t('personal_return')}}</p>
+        <p>{{ $t('personal_addjoin') }}</p>
+        <p>{{ $t('personal_return') }}</p>
 
-        <button @click="addNetwork" class="u-button u-button-primary">{{$t('personal_add')}}</button> <br />
-        <a v-if="networks.length>0" @click.stop="toggleStateBrowser" class="u-link kiwi-personal-existing-networks">{{$t('personal_saved')}}</a>
+        <button
+            class="u-button u-button-primary"
+            @click="addNetwork"
+        >
+            {{ $t('personal_add') }}
+        </button> <br >
+
+        <a
+            v-if="networks.length>0"
+            class="u-link kiwi-personal-existing-networks"
+            @click.stop="toggleStateBrowser"
+        >
+            {{ $t('personal_saved') }}
+        </a>
 
         <div
-            class="kiwi-aboutnew-content"
             :class="{'kiwi-aboutnew-content--open': about_open}"
+            class="kiwi-aboutnew-content"
             v-html="aboutContent"
-        ></div>
+        />
         <div class="kiwi-aboutnew">
-            <div class="kiwi-aboutnew-sep"></div>
-            <a class="u-link" @click="about_open=!about_open">Link to your network / channel</a>
+            <div class="kiwi-aboutnew-sep"/>
+            <a
+                class="u-link"
+                @click="about_open=!about_open"
+            >
+                Link to your network / channel
+            </a>
 
             <div class="kiwi-aboutnew-help">
-                <a @click="about_open=!about_open"><i class="fa fa-question-circle" aria-hidden="true"></i></a>
+                <a @click="about_open=!about_open">
+                    <i class="fa fa-question-circle" aria-hidden="true"/>
+                </a>
             </div>
-        </div>
-
-        <div class="kiwi-sponsor">
-            Sponsored by <a href="//www.privateinternetaccess.com/">PrivateInternetAccess</a>
-            <span>Protect your internet with a VPN</span>
         </div>
     </div>
 </template>
 
 <script>
+'kiwi public';
 
+import * as TextFormatting from '@/helpers/TextFormatting';
 import state from '@/libs/state';
 import aboutContent from './about.html';
 
@@ -53,8 +69,8 @@ const ctor = {
     methods: {
         addNetwork() {
             let nick = 'Guest' + Math.floor(Math.random() * 100);
-            let network = state.addNetwork('New Network', nick, {});
-            state.$emit('network.settings', network);
+            let network = state.addNetwork(TextFormatting.t('new_network'), nick, {});
+            network.showServerBuffer('settings');
         },
         toggleStateBrowser() {
             state.$emit('statebrowser.show');
@@ -126,41 +142,6 @@ state.getStartups().kiwiirccom = ctor;
     }
 }
 
-.kiwi-sponsor {
-    position: fixed;
-    z-index: 20;
-    bottom: 0;
-    left: 0;
-    width: 185px;
-    padding: 10px 0;
-    font-size: 0.8em;
-    color: #e0e0e0;
-}
-
-@media screen and (max-width: 600px) {
-    .kiwi-sponsor {
-        display: none;
-    }
-}
-
-.kiwi-sponsor a {
-    color: #e0e0e0;
-}
-
-.kiwi-sponsor span {
-    display: none;
-    font-style: italic;
-}
-
-.kiwi-sponsor:hover span {
-    display: block;
-}
-
-.kiwi-sponsor a:hover {
-    color: #bbe073;
-    text-decoration: none;
-}
-
 .kiwi-personal {
     box-sizing: border-box;
     height: 100%;
@@ -168,15 +149,25 @@ state.getStartups().kiwiirccom = ctor;
     text-align: center;
     padding-top: 1em;
     font-size: 1.2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
 }
 
 .kiwi-personal h1 {
-    margin: 2em 0;
+    margin: 0 0 20px 0;
+}
+
+.kiwi-personal p {
+    margin: 0 0 10px 0;
 }
 
 .kiwi-personal button {
-    margin-top: 2.7em;
-    margin-bottom: 1.5em;
+    margin: 10px auto 0 auto;
+    padding: 0 40px;
+    font-size: 1em;
+    line-height: 40px;
 }
 
 /* Only show the toggle state browser link if on a small screen */

@@ -1,36 +1,54 @@
 <template>
-    <div class="kiwi-nicklist">
-        <div class="kiwi-nicklist-info">
-            <input :placeholder="$t('person', {count: sortedUsers.length})" v-model="user_filter" ref="user_filter">
-            <i class="fa fa-search" @click="$refs.user_filter.focus()"></i>
-        </div>
-        <ul class="kiwi-nicklist-users">
-            <li
-                v-for="user in sortedUsers"
-                :key="user.nick"
-                class="kiwi-nicklist-user"
-                v-bind:class="[
-                    userMode(user) ? 'kiwi-nicklist-user--mode-' + userMode(user) : '',
-                    user.away ? 'kiwi-nicklist-user--away' : ''
-                ]"
+    <div :class="{'kiwi-nicklist--filtering': filter_visible }" class="kiwi-nicklist">
+        <div class="kiwi-nicklist-usercount" @click="toggleUserFilter">
+            <span>
+                {{
+                    filter_visible ?
+                        sortedUsers.length :
+                        $t('person', {count: sortedUsers.length})
+                }}
+            </span>
+
+            <input
+                ref="user_filter"
+                :placeholder="$t('filter_users')"
+                v-model="user_filter"
+                @blur="onFilterBlur"
             >
-                <span class="kiwi-nicklist-user-prefix">{{userModePrefix(user)}}</span><span
-                    class="kiwi-nicklist-user-nick"
-                    @click="openUserbox(user, $event)"
-                    v-bind:style="nickStyle(user.nick)"
-                >{{user.nick}}</span>
-            </li>
-        </ul>
+            <i class="fa fa-search"/>
+        </div>
+
+        <DynamicScroller
+            :items="sortedUsers"
+            :min-item-size="26"
+            :key-field="'nick'"
+            class="kiwi-nicklist-users"
+        >
+            <template v-slot="{ item, index, active }">
+                <DynamicScrollerItem
+                    :item="item"
+                    :active="active"
+                    :size-dependencies="[]"
+                    :data-index="index"
+                >
+                    <nicklist-user
+                        :key="item.nick"
+                        :user="item"
+                        :nicklist="self"
+                        :network="network"
+                    />
+                </DynamicScrollerItem>
+            </template>
+        </DynamicScroller>
     </div>
 </template>
 
-
 <script>
 
-import state from '@/libs/state';
+'kiwi public';
+
 import Logger from '@/libs/Logger';
-import * as TextFormatting from '@/helpers/TextFormatting';
-import * as Misc from '@/helpers/Misc';
+import NicklistUser from './NicklistUser';
 
 let log = Logger.namespace('Nicklist');
 
@@ -45,15 +63,20 @@ function strCompare(a, b) {
 }
 
 export default {
+    components: {
+        NicklistUser,
+    },
+    props: ['network', 'buffer', 'sidebarState'],
     data: function data() {
         return {
             userbox_user: null,
             user_filter: '',
+            filter_visible: false,
+            self: this,
         };
     },
-    props: ['network', 'buffer', 'users'],
     computed: {
-        sortedUsers: function sortedUsers() {
+        sortedUsers() {
             // Get a list of network prefixes and give them a rank number
             let netPrefixes = this.network.ircClient.network.options.PREFIX;
             let prefixOrders = Object.create(null);
@@ -70,7 +93,7 @@ export default {
             let users = [];
             let bufferUsers = this.buffer.users;
             let nickFilter = this.user_filter.toLowerCase();
-            /* eslint-disable guard-for-in */
+            /* eslint-disable guard-for-in, no-restricted-syntax */
             for (let lowercaseNick in bufferUsers) {
                 let user = bufferUsers[lowercaseNick];
                 nickMap[user.nick] = lowercaseNick;
@@ -134,87 +157,133 @@ export default {
                 return strCompare(nickMap[a.nick], nickMap[b.nick]);
             });
         },
-        useColouredNicks: function useColouredNicks() {
+        useColouredNicks() {
             return this.buffer.setting('coloured_nicklist');
         },
     },
     methods: {
-        nickStyle: function nickStyle(nick) {
-            let styles = {};
-            if (this.useColouredNicks) {
-                styles.color = TextFormatting.createNickColour(nick);
+        userModePrefix(user) {
+            return this.buffer.userModePrefix(user);
+        },
+        userMode(user) {
+            return this.buffer.userMode(user);
+        },
+        openQuery(user) {
+            let buffer = this.$state.addBuffer(this.buffer.networkid, user.nick);
+            this.$state.setActiveBuffer(buffer.networkid, buffer.name);
+            if (this.$state.ui.is_narrow) {
+                this.sidebarState.close();
             }
-            return styles;
         },
-        userModePrefix: function userModePrefix(user) {
-            return Misc.userModePrefix(user, this.buffer);
-        },
-        userMode: function userMode(user) {
-            return Misc.userMode(user, this.buffer);
-        },
-        openQuery: function openQuery(user) {
-            let buffer = state.addBuffer(this.buffer.networkid, user.nick);
-            state.setActiveBuffer(buffer.networkid, buffer.name);
-        },
-        openUserbox: function openUserbox(user, mouseEvent) {
-            state.$emit('userbox.show', user, {
-                top: mouseEvent.clientY,
-                left: mouseEvent.clientX,
+        openUserbox(user) {
+            this.$state.$emit('userbox.show', user, {
                 buffer: this.buffer,
             });
+        },
+        toggleUserFilter() {
+            this.filter_visible = !this.filter_visible;
+            if (this.filter_visible) {
+                this.$nextTick(() => this.$refs.user_filter.focus());
+            } else {
+                this.user_filter = '';
+            }
+        },
+        onFilterBlur() {
+            if (!this.user_filter) {
+                this.filter_visible = false;
+            }
         },
     },
 };
 </script>
 
+<style lang="less">
 
-<style>
+/* Adjust the sidebars width when this nicklist is in view */
+.kiwi-sidebar.kiwi-sidebar-section-nicklist {
+    max-width: 250px;
+    width: 250px;
+}
+
 .kiwi-nicklist {
     overflow: hidden;
     box-sizing: border-box;
-    overflow-y: auto;
-}
-
-.kiwi-nicklist-info {
-    font-size: 0.9em;
-    padding-bottom: 0;
-    text-align: center;
-    border-width: 0 0 1px 0;
-    border-style: solid;
+    min-height: 100px;
+    margin: auto;
+    width: 100%;
+    //Padding bottom is needed, otherwise the scrollbar will show on the right side.
+    padding-bottom: 1px;
+    height: 100%;
     display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
-.kiwi-nicklist-info input {
-    flex: 1;
-    border: 0;
-    background: 0 0;
-    padding: 10px 0 10px 20px;
-    margin: 0;
-    outline: 0;
-    text-align: center;
+.kiwi-nicklist-usercount {
+    display: flex;
+    justify-content: space-between;
+    cursor: default;
+    box-sizing: border-box;
+    height: 43px;
+    line-height: 40px;
+    width: 100%;
+    border-bottom: 1px solid;
 }
 
-.kiwi-nicklist-info i.fa-search {
-    flex: 1;
-    margin-right: 25px;
-    color: #cfcfcf;
+.kiwi-nicklist-usercount span {
+    margin-left: 15px;
+    font-weight: 600;
+}
+
+.kiwi-nicklist-usercount .fa-search {
+    opacity: 0.3;
     cursor: pointer;
-    line-height: 50px;
+    font-size: 1.2em;
+    line-height: 40px;
+    align-self: flex-start;
+    margin-right: 15px;
+}
+
+.kiwi-nicklist-usercount .fa-search:hover,
+.kiwi-nicklist--filtering .kiwi-nicklist-usercount .fa-search {
+    opacity: 1;
+}
+
+.kiwi-nicklist-usercount input {
+    width: 0%;
+    border: none;
+    font-weight: normal;
+    background: none;
+    outline: 0;
+    padding: 0 15px 0 10px;
+    opacity: 0;
+    box-sizing: border-box;
+    flex-grow: 1;
+    transition: all 0.2s;
+}
+
+.kiwi-nicklist--filtering .kiwi-nicklist-usercount input {
+    opacity: 1;
 }
 
 .kiwi-nicklist-users {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    box-sizing: border-box;
+    max-height: 100%;
+    flex: 1 auto;
     list-style: none;
-    padding: 0 20px;
     line-height: 1.2em;
 }
 
-.kiwi-nicklist-user {
-    padding: 3px 0;
-}
-
-.kiwi-nicklist-user-nick {
-    font-weight: bold;
-    cursor: pointer;
+@media screen and (max-width: 759px) {
+    .kiwi-sidebar.kiwi-sidebar-section-nicklist {
+        width: 100%;
+        max-width: 380px;
+    }
 }
 
 </style>

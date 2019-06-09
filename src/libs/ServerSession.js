@@ -1,3 +1,5 @@
+'kiwi public';
+
 import EventEmitter from 'eventemitter3';
 import state from './state';
 import * as ServerConnection from './ServerConnection';
@@ -12,7 +14,7 @@ export default class ServerSession {
 
         this.bus = new EventEmitter();
         this.channel = channelConstruct();
-        this.channel.on('line', line => {
+        this.channel.on('line', (line) => {
             if (line.indexOf('CONTROL ') === 0) {
                 let parts = line.split(' ');
 
@@ -27,7 +29,7 @@ export default class ServerSession {
 
     auth(userId, password) {
         return new Promise((resolve, reject) => {
-            this.bus.once('AUTH', params => {
+            this.bus.once('AUTH', (params) => {
                 let result = params[0];
 
                 if (result === 'OK') {
@@ -42,16 +44,16 @@ export default class ServerSession {
     }
 
     getNetworks() {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
             let networks = Object.create(null);
 
-            let onListing = params => {
+            let onListing = (params) => {
                 if (params[1] === 'END') {
                     this.bus.off('LISTING', onListing);
 
                     // Convert our networks object to an array first
                     let networkArr = [];
-                    Object.keys(networks).forEach(channeId => {
+                    Object.keys(networks).forEach((channeId) => {
                         networkArr.push(networks[channeId]);
                     });
 
@@ -63,7 +65,7 @@ export default class ServerSession {
                     let props = params.slice(1);
                     let network = { buffers: [] };
 
-                    props.forEach(prop => {
+                    props.forEach((prop) => {
                         let parts = prop.split('=');
                         if (parts[0] && parts[1]) {
                             network[parts[0].toLowerCase()] = parts[1];
@@ -79,7 +81,7 @@ export default class ServerSession {
                     let props = params.slice(1);
                     let buffer = {};
 
-                    props.forEach(prop => {
+                    props.forEach((prop) => {
                         let parts = prop.split('=');
                         if (parts[0] && parts[1]) {
                             buffer[parts[0].toLowerCase()] = parts[1];
